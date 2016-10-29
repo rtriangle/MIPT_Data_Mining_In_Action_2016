@@ -1,6 +1,5 @@
 import numpy as np
 from scipy import sparse
-from scipy.special import expit
 
 
 class LogisticRegression:
@@ -48,9 +47,6 @@ class LogisticRegression:
             # replacement is faster than sampling without replacement.              #
             #########################################################################
 
-            batch = np.random.choice(num_train, batch_size, replace=True)
-            X_batch = X[batch]
-            y_batch = y[batch]
 
             #########################################################################
             #                       END OF YOUR CODE                                #
@@ -64,15 +60,13 @@ class LogisticRegression:
             # TODO:                                                                 #
             # Update the weights using the gradient and the learning rate.          #
             #########################################################################
-            
-            self.w -= learning_rate * gradW
 
 
             #########################################################################
             #                       END OF YOUR CODE                                #
             #########################################################################
 
-            if verbose and it % 10 == 0:
+            if verbose and it % 100 == 0:
                 print 'iteration %d / %d: loss %f' % (it, num_iters, loss)
 
         return self
@@ -98,13 +92,7 @@ class LogisticRegression:
         # Hint: It might be helpful to use np.vstack and np.sum                   #
         ###########################################################################
 
-        thetha_X = sparse.csr_matrix.dot(X, np.matrix(self.w).T)
-        
-        sigmoid = lambda x: 1.0 / (1.0 + np.exp(-x))
-        h_thetha_X = np.squeeze(np.asarray(sigmoid(thetha_X)))
-        
-        y_proba = np.vstack((1 - h_thetha_X, h_thetha_X)).T
-        #print y_proba
+
 
         ###########################################################################
         #                           END OF YOUR CODE                              #
@@ -129,7 +117,7 @@ class LogisticRegression:
         # Implement this method. Store the predicted labels in y_pred.            #
         ###########################################################################
         y_proba = self.predict_proba(X, append_bias=True)
-        y_pred = np.argmax(y_proba, axis=1)
+        y_pred = ...
 
         ###########################################################################
         #                           END OF YOUR CODE                              #
@@ -149,34 +137,16 @@ class LogisticRegression:
         dw = np.zeros_like(self.w)  # initialize the gradient as zero
         loss = 0
         # Compute loss and gradient. Your code should not contain python loops.
-        
-        thetha_X = sparse.csr_matrix.dot(X_batch, np.matrix(self.w).T)
-        #print 'thetha_X shape : ' + str(thetha_X.shape)
-        sigmoid = lambda x: 1.0 / (1.0 + np.exp(-x))
-        h_thetha_X = np.squeeze(np.asarray(sigmoid(thetha_X)))
 
-        #print h_thetha_X.shape
-        dw = np.squeeze(np.asarray(sparse.csc_matrix.dot(X_batch.T, np.matrix(y_batch - h_thetha_X).T).T))
-        
-        loss = -(y_batch * np.log(h_thetha_X) + (1.0 - y_batch) * np.log(1.0 - h_thetha_X))
-        #loss = -np.sum(y_batch * np.log(1. / (1.+np.exp(-h_thetha_X)))) - np.sum((1-y_batch) * np.log(1. - 1. / (1.+np.exp(-h_thetha_X))))
+
         # Right now the loss is a sum over all training examples, but we want it
         # to be an average instead so we divide by num_train.
         # Note that the same thing must be done with gradient.
-        #print 'loss : ' + str(loss)
-        
-        loss = np.mean(loss)
-        #print 'loss : ' + str(loss)
-        dw /= -X_batch.shape[0]
-        #print 'dw : ' + str(dw)
-            
+
+
         # Add regularization to the loss and gradient.
         # Note that you have to exclude bias term in regularization.
-        
-        loss += reg * np.sum(self.w[:-1] ** 2)
-        dw += 2 * reg * np.hstack((self.w[:-1], [0]))
-        
-        
+
 
         return loss, dw
 
